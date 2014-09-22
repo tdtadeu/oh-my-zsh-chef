@@ -1,6 +1,6 @@
 include_recipe "git"
 
-def setup(users)
+def setup_zsh(users)
   install_zsh
 
   install_oh_my_zsh(users)
@@ -64,4 +64,4 @@ end
 
 users = node['oh_my_zsh']['users']
 
-setup(users)
+setup_zsh(users)

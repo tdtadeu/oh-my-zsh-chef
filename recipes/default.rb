@@ -3,34 +3,32 @@ include_recipe "git"
 def setup_zsh(users)
   install_zsh
 
-  install_oh_my_zsh(users)
+  users.each do |user|
+    install_oh_my_zsh(user)
 
-  config_oh_my_zsh(users)
+    config_oh_my_zsh(user)
+  end
+
+  set_profile
 end
 
 def install_zsh
   package "zsh"
 end
 
-def install_oh_my_zsh(users)
-  users.each do |user|
-    git "/home/#{user}/.oh-my-zsh" do
-      repository node['oh_my_zsh']['repository']
-      user user
-      reference "master"
-      action :sync
-    end
+def install_oh_my_zsh(user)
+  git "/home/#{user}/.oh-my-zsh" do
+    repository node['oh_my_zsh']['repository']
+    user user
+    reference "master"
+    action :sync
   end
 end
 
 def config_oh_my_zsh(users)
-  users.each do |user|
-    set_zshrc(user)
+  set_zshrc(user)
 
-    select_shell(user)
-
-    set_profile
-  end
+  select_shell(user)
 end
 
 def set_zshrc(user)

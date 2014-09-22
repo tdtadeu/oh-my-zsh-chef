@@ -9,9 +9,9 @@ You can define it by configure like :
 
 ```
 [:oh_my_zsh][:users] = [{
-  :login => 'shingara',
-  :theme => 'rachel',
-  :plugins => ['gem', 'git', 'rails3', 'redis-cli', 'ruby']
+  login: 'shingara',
+  theme: 'rachel',
+  plugins: ['gem', 'git', 'rails3', 'redis-cli', 'ruby']
 }]
 ```
 

@@ -1,47 +1,67 @@
-#
-# Cookbook Name:: oh_my_zsh
-# Recipe:: default
-#
+include_recipe "git"
 
-if node['oh_my_zsh']['users'].any?
-  package "zsh"
-  include_recipe "git"
+def setup(users)
+  install_zsh
+
+  install_oh_my_zsh(users)
+
+  config_oh_my_zsh(users)
 end
 
-# for each listed user
-node['oh_my_zsh']['users'].each do |user_hash|
-  home_directory = `cat /etc/passwd | grep "^#{user_hash[:login]}:" | cut -d ":" -f6`.chop
+def install_zsh
+  package "zsh"
+end
 
-  git "#{home_directory}/.oh-my-zsh" do
-    repository node['oh_my_zsh'][:repository]
-    user user_hash[:login]
-    reference "master"
-    action :sync
+def install_oh_my_zsh(users)
+  users.each do |user|
+    git "/home/#{user}/.oh-my-zsh" do
+      repository node['oh_my_zsh']['repository']
+      user user
+      reference "master"
+      action :sync
+    end
   end
+end
 
-  template "#{home_directory}/.zshrc" do
+def config_oh_my_zsh(users)
+  users.each do |user|
+    set_zshrc(user)
+
+    select_shell(user)
+
+    set_profile
+  end
+end
+
+def set_zshrc(user)
+  template "/home/#{user}/.zshrc" do
     source "zshrc.erb"
-    owner user_hash[:login]
+    owner user
     mode "644"
     action :create_if_missing
     variables({
-      :user => user_hash[:login],
-      :theme => user_hash[:theme] || 'robbyrussell',
-      :case_sensitive => user_hash[:case_sensitive] || false,
-      :plugins => user_hash[:plugins] || %w(git)
+      user: user,
+      theme: node['oh_my_zsh']['theme'],
+      case_sensitive: false,
+      plugins: %w(git)
     })
   end
+end
 
-  user user_hash[:login] do
+def select_shell(user)
+  user user do
     action :modify
     shell '/bin/zsh'
   end
-
-  if platform?("debian", "ubuntu")
-    execute "source /etc/profile to all zshrc" do
-      command "echo 'source /etc/profile' >> /etc/zsh/zprofile"
-      not_if "grep 'source /etc/profile' /etc/zsh/zprofile"
-    end
-  end
-
 end
+
+def set_profile
+  execute "source /etc/profile to all zshrc" do
+    command "echo 'source /etc/profile' >> /etc/zsh/zprofile"
+    not_if "grep 'source /etc/profile' /etc/zsh/zprofile"
+  end
+end
+
+users = node['oh_my_zsh']['users']
+
+setup(users)

@@ -25,7 +25,7 @@ def install_oh_my_zsh(user)
   end
 end
 
-def config_oh_my_zsh(users)
+def config_oh_my_zsh(user)
   set_zshrc(user)
 
   select_shell(user)

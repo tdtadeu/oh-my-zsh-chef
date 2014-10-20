@@ -19,7 +19,7 @@ end
 
 def install_oh_my_zsh(user)
   git "/home/#{user}/.oh-my-zsh" do
-    repository node['oh_my_zsh']['repository']
+    repository node[:oh_my_zsh][:repository]
     user user
     reference "master"
     action :sync
@@ -42,7 +42,7 @@ def set_zshrc(user)
     action :create_if_missing
     variables({
       user: user,
-      theme: node['oh_my_zsh']['theme'],
+      theme: node[:oh_my_zsh][:theme],
       case_sensitive: false,
       plugins: %w(git)
     })
@@ -72,6 +72,6 @@ def set_profile
   end
 end
 
-users = node['oh_my_zsh']['users']
+users = node[:oh_my_zsh][:users]
 
 setup_zsh(users)

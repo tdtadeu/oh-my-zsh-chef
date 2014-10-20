@@ -1,4 +1,5 @@
 include_recipe "git"
+include_recipe "apt"
 
 def setup_zsh(users)
   install_zsh
@@ -49,7 +50,7 @@ end
 def select_shell(user)
   user user do
     action :modify
-    shell '/bin/zsh'
+    shell '/usr/bin/zsh'
   end
 end
 

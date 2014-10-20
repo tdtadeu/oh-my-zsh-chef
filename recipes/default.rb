@@ -29,6 +29,8 @@ end
 def config_oh_my_zsh(user)
   set_zshrc(user)
 
+  set_zlogin(user)
+
   select_shell(user)
 end
 
@@ -47,10 +49,19 @@ def set_zshrc(user)
   end
 end
 
+def set_zlogin(user)
+  template "/home/#{user}/.zlogin" do
+    source "zlogin.erb"
+    owner user
+    mode "644"
+    action :create_if_missing
+  end
+end
+
 def select_shell(user)
   user user do
     action :modify
-    shell '/usr/bin/zsh'
+    shell '/bin/zsh'
   end
 end
 

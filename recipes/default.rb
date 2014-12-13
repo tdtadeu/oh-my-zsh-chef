@@ -1,13 +1,13 @@
 include_recipe "git"
 include_recipe "apt"
 
-def setup_zsh(users)
+def setup_zsh(users, zlogin_gist)
   install_zsh
 
   users.each do |user|
     install_oh_my_zsh(user)
 
-    config_oh_my_zsh(user)
+    config_oh_my_zsh(user, zlogin_gist)
   end
 
   set_profile
@@ -26,10 +26,10 @@ def install_oh_my_zsh(user)
   end
 end
 
-def config_oh_my_zsh(user)
+def config_oh_my_zsh(user, zlogin_gist)
   set_zshrc(user)
 
-  set_zlogin(user)
+  set_zlogin(user, zlogin_gist)
 
   select_shell(user)
 end
@@ -49,12 +49,20 @@ def set_zshrc(user)
   end
 end
 
-def set_zlogin(user)
+def set_zlogin(user, zlogin_gist)
+  remote_file "Create .tmux.conf" do
+    path "/home/#{user}/.zlogin"
+    user user
+    source zlogin_gist
+    not_if { File.exists?("/home/#{user}/.zlogin") }
+  end
+
   template "/home/#{user}/.zlogin" do
     source "zlogin.erb"
     owner user
     mode "644"
     action :create_if_missing
+    not_if { File.exists?("/home/#{user}/.zlogin") }
   end
 end
 
@@ -73,5 +81,6 @@ def set_profile
 end
 
 users = node[:oh_my_zsh][:users]
+zlogin_gist = node[:oh_my_zsh][:zlogin_gist]
 
-setup_zsh(users)
+setup_zsh(users, zlogin_gist)

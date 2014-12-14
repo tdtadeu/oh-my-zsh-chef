@@ -1,5 +1,5 @@
 include_recipe "git"
-include_recipe "apt"
+include_recipe "zsh"
 
 def setup_zsh(users, zlogin_gist, zshrc_gist)
   users.each do |user|
@@ -35,7 +35,7 @@ end
 def set_zshrc(user, zshrc_gist)
   if zshrc_gist && zshrc_gist.length > 0
     remote_file "Create .zshrc" do
-      path "/home/#{user}/.zlogin"
+      path "/home/#{user}/.zshrc"
       user user
       source zshrc_gist
       not_if { File.exists?("/home/#{user}/.zshrc") }
